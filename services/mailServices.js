@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-export async function sendMailToResetPassword(emailId, resetPasswordLink) {
+async function sendMailToResetPassword(emailId, resetPasswordLink) {
     // send mail with defined transport object
     const info = await transporter.sendMail({
         from: process.env.FROMUSER,

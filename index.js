@@ -2,7 +2,8 @@ import express from 'express';
 import { PORT } from './utils/envConfig.js';
 import { connectDatabase } from './database/dbConfig.js';
 import { authRoutes } from './routes/authRoutes.js';
-
+import { eventRoutes } from './routes/eventRoutes.js';
+import cors from 'cors';
 
 // Initialize the application
 const app = express();
@@ -10,6 +11,7 @@ const app = express();
 
 // Adding the Middlewares
 app.use(express.json());
+app.use(cors());
 
 
 //Connect to database

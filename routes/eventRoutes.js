@@ -1,6 +1,6 @@
 import express from 'express';
-import { authorizeByAdminRole, authorizeByToken } from '../middlewares/apiAuthMiddleware';
-import { createEventHandler, getEventsHandler } from '../controllers/eventController';
+import { authorizeByAdminRole, authorizeByToken } from '../middlewares/apiAuthMiddleware.js';
+import { createEventHandler, deleteEventHandler, getEventsHandler, updateEventHandler } from '../controllers/eventController.js';
 
 
 export const eventRoutes = express.Router();

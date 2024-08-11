@@ -1,4 +1,4 @@
-import { Event } from "../models/eventModel";
+import { Event } from "../models/eventModel.js";
 
 
 // Create event handler

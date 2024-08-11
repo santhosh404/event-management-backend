@@ -38,6 +38,10 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    tag: {
+        type: String,
+        enum: ['music', 'standup comedy']
+    },
     bookings: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Booking',

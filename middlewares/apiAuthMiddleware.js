@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../utils/envConfig";
+import { JWT_SECRET } from "../utils/envConfig.js";
 
 
+// Middleware for token authorization
 const authorizeByToken = (req, res, next) => {
     const header = req.headers.get('authorization');
     const token = header && header.split(' ')[1];
@@ -32,6 +33,7 @@ const authorizeByToken = (req, res, next) => {
 }
 
 
+// Middleware for admin role authorization
 const authorizeByAdminRole = (req, res, next) => {
     if (req.user.role === 'admin') {
         next();

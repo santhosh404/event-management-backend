@@ -1,22 +1,22 @@
-import User from "../../../models/UserModel.js";
+import { User } from '../models/userModel.js'
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { sendMailToResetPassword } from "../../../services/service.js";
+import { sendMailToResetPassword } from "../services/mailServices.js";
 import mongoose from "mongoose";
 import { JWT_EXPIRATION_TIME, JWT_SECRET } from "../utils/envConfig.js";
 
 
 // Signup Handler
 const signUpHandler = async (req, res) => {
-    let { userName, email, phoneNumber, password } = req.body;
+    let { username, email, phoneNumber, password } = req.body;
 
     try {
-        if (!userName || !email || !phoneNumber || !password) {
+        if (!username || !email || !phoneNumber || !password) {
             return res.status(400).json({
                 status: "Error",
                 message: "Signup Failed!",
                 data: {
-                    error: "Missing required fields 'userName', 'email', 'phoneNumber', 'password'"
+                    error: "Missing required fields 'username', 'email', 'phoneNumber', 'password'"
                 }
             })
         }
@@ -35,7 +35,7 @@ const signUpHandler = async (req, res) => {
 
         //Encrypting password
         password = await bcrypt.hash(password, 10);
-        const newUserObject = new User({ userName: userName, email: email, phoneNumber: phoneNumber, password: password });
+        const newUserObject = new User({ userName: username, email: email, phoneNumber: phoneNumber, password: password });
         const newUser = await newUserObject.save()
 
         return res.status(201).json({
@@ -213,7 +213,7 @@ const resetPasswordHandler = async (req, res) => {
                 })
             }
             const encryptedPassword = await bcrypt.hash(password, 10);
-            const updatedUser = await User.findOneAndUpdate({ _id: id }, { $set: { password: encryptedPassword, updatedAt: new Date() } }, { new: true });
+            const updatedUser = await User.findOneAndUpdate({ _id: id }, { $set: { password: encryptedPassword, } }, { new: true });
 
             return res.status(200).json({
                 status: "Success",
