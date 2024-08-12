@@ -4,7 +4,7 @@ import { JWT_SECRET } from "../utils/envConfig.js";
 
 // Middleware for token authorization
 const authorizeByToken = (req, res, next) => {
-    const header = req.headers.get('authorization');
+    const header = req.headers['authorization'];
     const token = header && header.split(' ')[1];
 
     if (!token) {

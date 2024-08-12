@@ -70,26 +70,57 @@ export const getEventsHandler = async (req, res) => {
     }
 }
 
+// Get event by id handler
+
+export const getEventByIdHandler = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const event = await Event.findById(id);
+        if (!event) {
+            return res.status(404).json({
+                status: "Error",
+                message: "Event not found!",
+                data: {
+                    error: `Event with id ${id} not found!`
+                }
+            });
+        }
+        return res.status(200).json({
+            status: "Success",
+            message: "Event fetched successfully!",
+            data: event
+        });
+    } catch (err) {
+        return res.status(500).json({
+            status: "Error",
+            message: "Internal Server Error!",
+            data: {
+                error: err.message
+            }
+        });
+    }
+}
+
 // Update event handler
 export const updateEventHandler = async (req, res) => {
     const { id } = req.params;
     const { posterImage, title, description, date, time, location, organizerCompany, capacity, price } = req.body;
     try {
         const event = await Event.findByIdAndUpdate(
-            id, 
-            { 
-                posterImage, 
-                title, 
-                description, 
-                date, 
-                time, 
-                location, 
-                organizerCompany, 
+            id,
+            {
+                posterImage,
+                title,
+                description,
+                date,
+                time,
+                location,
+                organizerCompany,
                 capacity,
                 price
-            }, 
-            { 
-                new: true 
+            },
+            {
+                new: true
             }
         );
         if (!event) {

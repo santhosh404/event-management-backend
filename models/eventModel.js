@@ -15,7 +15,7 @@ const eventSchema = new mongoose.Schema({
         required: true
     },
     date: {
-        type: Date,
+        type: String,
         required: true,
     },
     time: {
@@ -40,7 +40,7 @@ const eventSchema = new mongoose.Schema({
     },
     tag: {
         type: String,
-        enum: ['music', 'standup comedy']
+        enum: ['Music', 'Comedy', 'Workshop']
     },
     bookings: [{
         type: mongoose.Schema.Types.ObjectId,
