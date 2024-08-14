@@ -1,8 +1,8 @@
 import express from 'express';
-import { authorizeByToken } from '../middlewares/apiAuthMiddleware';
-import { bookEventHandler } from '../controllers/bookingController';
+import { authorizeByToken } from '../middlewares/apiAuthMiddleware.js';
+import { bookEventHandler } from '../controllers/bookingController.js';
 
-const bookingRoutes = express.Router();
+export const bookingRoutes = express.Router();
 
 
 bookingRoutes.post('/book-event', authorizeByToken, bookEventHandler); 

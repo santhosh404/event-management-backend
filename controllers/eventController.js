@@ -1,3 +1,4 @@
+import { Booking } from "../models/bookingModel.js";
 import { Event } from "../models/eventModel.js";
 
 
@@ -183,28 +184,40 @@ export const deleteEventHandler = async (req, res) => {
     }
 }
 
-// Get Event by tag name
-export const getEventByTagHandler = async (req, res) => {
+export const eventByTagHandler = async (req, res) => {
     try {
         const eventByTag = await Event.aggregate([
+
+            {
+                $match: { tag: { $exists: true } } // Ensure tag field exists
+            },
             {
                 $group: {
                     _id: '$tag',
                     tagCount: { $sum: 1 }
                 }
+            },
+
+            {
+                $project: {
+                    _id: 0,
+                    tagName: '$_id',
+                    tagCount: '$tagCount',
+                }
             }
         ])
-        console.log(eventByTag);
+
+        const eventCount = await Event.find();
         return res.status(200).json({
             status: "Success",
             message: "Events fetched successfully!",
             data: {
-                tag: eventByTag
+                tag: eventByTag,
+                totalCount: eventCount.length
             }
         });
 
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).json({
             status: "Error",
             message: "Internal Server Error!",
@@ -213,4 +226,57 @@ export const getEventByTagHandler = async (req, res) => {
             }
         });
     }
-} 
+}
+
+
+export const eventByTagFilterHandler = async (req, res) => {
+    const { tag } = req.query;
+
+    try {
+        const eventByTag = await Event.find({ tag: tag });
+        if (!eventByTag) {
+            return res.status(404).json({
+                status: "Error",
+                message: "Events not found!",
+                data: {
+                    error: `No events found with tag ${tag}`
+                }
+            });
+        }
+        return res.status(200).json({
+            status: "Success",
+            message: "Events fetched successfully!",
+            data: eventByTag
+        });
+    } catch (err) {
+        return res.status(500).json({
+            status: "Error",
+            message: "Internal Server Error!",
+            data: {
+                error: err.message
+            }
+        });
+    }
+}
+
+
+export const getBookingsOfUserHandler = async (req, res) => {
+    try {
+        const bookings = await Booking.find({ bookedBy: req.user._id }).populate('eventId');
+        return res.status(200).json({
+            status: "Success",
+            message: "Bookings fetched successfully!",
+            data: {
+                booking: bookings
+            }
+        });
+    } catch (err) {
+        return res.status(500).json({
+            status: "Error",
+            message: "Internal Server Error!",
+            data: {
+                error: err.message
+            }
+        });
+    }
+}

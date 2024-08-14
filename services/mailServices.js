@@ -1,4 +1,9 @@
 import nodemailer from 'nodemailer';
+import QRCode from "qrcode";
+import moceansdk from 'mocean-sdk';
+import { MOCEAN_KEY, MOCEAN_SECRET } from '../utils/envConfig.js';
+import moment from "moment";
+
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -8,6 +13,10 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAILUSERPASSWORD
     },
 });
+
+const mocean = new moceansdk.Mocean(
+    new moceansdk.Client(MOCEAN_KEY, MOCEAN_SECRET)
+);
 
 
 async function sendMailToResetPassword(emailId, resetPasswordLink) {
@@ -97,4 +106,50 @@ async function sendMailToResetPassword(emailId, resetPasswordLink) {
     return info;
 }
 
-export { sendMailToResetPassword }
+
+const sendTicketEmailToUser = async (user, event, booking) => {
+    const qrCodeDataURL = await QRCode.toDataURL(`Booking ID: ${booking._id}`);
+    const ticketHTML = `
+        <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+            <div style="background: #1e88e5; color: white; padding: 10px; text-align: center;">
+                <h2 style="margin: 0;">${event.title}</h2>
+                <p style="margin: 0;">${moment(event.date).format('ll')} at ${event.time}</p>
+                <p style="margin: 0;">${event.location}</p>
+            </div>
+
+            <div style="padding: 20px; border-bottom: 1px dashed #ccc;">
+                <p><strong>Booking ID:</strong> ${booking._id}</p>
+                <p><strong>Name:</strong> ${user.username}</p>
+                <p><strong>Seats Booked:</strong> ${booking.noOfSeats}</p>
+                <p><strong>Booking Date:</strong> ${moment(booking.bookingDate).format('ll')}</p>
+            </div>
+
+            <div style="padding: 20px; text-align: center; border-bottom: 1px dashed #ccc;">
+                <img src="${qrCodeDataURL}" alt="QR Code" style="width: 100px; height: 100px;" />
+                <p style="margin-top: 10px;">Scan this QR code at the event</p>
+            </div>
+
+            <div style="padding: 20px; text-align: center; position: relative;">
+                <p style="border-top: 1px dashed #ccc; padding-top: 10px; margin: 0; position: relative;">
+                    <span style="background: white; padding: 0 10px; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #888;">Tear Here</span>
+                </p>
+                <p style="font-size: 0.8em; color: #888;">Thank you for booking with us! Enjoy the event.</p>
+            </div>
+        </div>
+    `;
+
+
+    try {
+        await transporter.sendMail({
+            from: process.env.FROMUSER,
+            to: user.email,
+            subject: `Your Ticket for ${event.title} has been booked`,
+            html: ticketHTML
+        });
+    } catch (e) {
+        throw e;
+    }
+
+}
+
+export { sendMailToResetPassword, sendTicketEmailToUser }
